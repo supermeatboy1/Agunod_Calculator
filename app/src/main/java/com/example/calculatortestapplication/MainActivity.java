@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
         public static final int DIVIDE = 3;
         public static final int EQUALS = 4;
     }
-    private boolean hasInput;
+    private boolean hasInput, continuous;
     private double number1, number2;
     private int currentOperator;
 
@@ -104,7 +104,12 @@ public class MainActivity extends AppCompatActivity {
             numberButtons[i].setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    editTextNumber.setText(editTextNumber.getText() + btn_num);
+                    if (continuous) {
+                        editTextNumber.setText(btn_num);
+                        continuous = false;
+                    } else {
+                        editTextNumber.setText(editTextNumber.getText() + btn_num);
+                    }
                 }
             });
         }
@@ -121,8 +126,8 @@ public class MainActivity extends AppCompatActivity {
     public void evaluate(int operator) {
         displayError(" ");
 
-        if (operator == ArithmeticOperator.EQUALS && hasInput) {
-            if (!checkNumberFormatting() && !checkInputLength())
+        if (hasInput) {
+            if (!checkInputLength() && !checkNumberFormatting())
                 return;
 
             number2 = Double.parseDouble(editTextNumber.getText().toString());
@@ -153,6 +158,14 @@ public class MainActivity extends AppCompatActivity {
                     displayError("ERROR: Invalid Arithmetic Operator!");
                     break;
             }
+
+            if (operator != ArithmeticOperator.EQUALS) {
+                currentOperator = operator;
+                hasInput = true;
+            }
+            continuous = true;
+
+            number1 = number2;
         } else {
             if (!checkInputLength())
                 return;
@@ -174,6 +187,7 @@ public class MainActivity extends AppCompatActivity {
         hasInput = false;
         number1 = number2 = 0.0d;
         currentOperator = -1;
+        continuous = false;
 
         editTextNumber.setText("");
         textViewOperation.setText("");
